@@ -9,8 +9,10 @@ export default function Cart() {
     console.log("cart", cart)
     const [Totalprice, setTotalprice] = useState(0)
     const [Totaltax, setTotaltax] = useState(0)
+    const [isLoading, setIsLoading] = useState(false);
+
     // const [Razorpay] = useRazorpay(); // error show razor apy
-    const { error, isLoading, Razorpay } = useRazorpay(); //error soultion
+    const { error, Razorpay } = useRazorpay(); //error soultion
 
     let deleteRow = (id) => {
         if (window.confirm("Are you sure want delete this???")) {
@@ -50,6 +52,7 @@ export default function Cart() {
             alert("Your cart is empty!");
             return;
         }
+        setIsLoading(true); // लोडिंग स्टेट सेट करें
 
 
         const userId = 1001; // Ideally, get this from the auth state
@@ -85,12 +88,12 @@ export default function Cart() {
                 if (success.data.data.status) {
                     openPaymentPopUp(success.data.data.id, success.data.data);
                 } else {
-                    console.log('Unable to place order');
+                    alert("Failed to create order");
                 }
             }
         ).catch((error) => {
-            console.error("Order placement failed", error);
-            alert("Failed to place order. Please try again.");
+            console.error("Order Error:", error);
+            alert("Payment failed. Please try again.");
         });
     }
 
