@@ -2,6 +2,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { cartContext } from '../Context/CartContext';
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+
 import axios from 'axios';
 
 export default function Cart() {
@@ -89,11 +91,15 @@ export default function Cart() {
                     openPaymentPopUp(success.data.data.id, success.data.data);
                 } else {
                     alert("Failed to create order");
+                    setIsLoading(false);
+
                 }
             }
         ).catch((error) => {
             console.error("Order Error:", error);
             alert("Payment failed. Please try again.");
+            setIsLoading(false);
+
         });
     }
 
@@ -125,7 +131,9 @@ export default function Cart() {
                 ).catch((error) => {
                     console.error("Error confirming order", error);
                     alert("Something went wrong. Please try again.");
-                });
+                })
+                    .finally(() => setIsLoading(false)); // ✅ लोडिंग false करें
+
             },
             prefill: {
                 name: "naveen saini",
@@ -142,6 +150,7 @@ export default function Cart() {
         const rzp1 = new Razorpay(options);
 
         rzp1.on("payment.failed", function (response) {
+            setIsLoading(false); // Payment fail होते ही लोडिंग बंद करें
 
             console.error("Payment failed", response);
             alert("Payment failed. Please try again.");
@@ -267,7 +276,18 @@ export default function Cart() {
                             <span>Total Cost</span>
                             <span>${(Totalprice + Totaltax).toFixed(2)}</span>
                         </div>
-                        <button className="bg-indigo-500 text-white w-full py-3 mt-4 rounded-md cursor-pointer" onClick={placeOrder}>Checkout</button>
+                        <button
+                            className="relative h-[50px] bg-indigo-500 text-white w-full py-3 mt-4 rounded-md cursor-pointer flex justify-center items-center"
+                            disabled={isLoading}
+                            onClick={placeOrder}
+                        >
+                            {isLoading ? (
+                                <AiOutlineLoading3Quarters className="animate-spin text-green-500 text-2xl" />
+                            ) : (
+                                "Checkout"
+                            )}
+                        </button>
+
                     </div>
                 </div>
             </div>

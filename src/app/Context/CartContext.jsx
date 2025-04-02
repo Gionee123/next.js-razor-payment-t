@@ -1,34 +1,26 @@
-"use client"
-import { createContext, useEffect, useState } from 'react';
-import { Cookies } from 'react-cookie';
+"use client";
+import { createContext, useEffect, useState } from "react";
 
 let cartContext = createContext();
 
 export default function CartContext({ children }) {
-    
-    
-    let [cart, setcart] = useState([])
+  let [cart, setcart] = useState([]);
 
-    let obj = {
-        cart,
-        setcart
-    }
-    useEffect(() => {
-        let oldCartData = JSON.parse(localStorage.getItem("CART")) ?? [];
-        setcart(oldCartData)
-        
-    }, [])
+  let obj = {
+    cart,
+    setcart,
+  };
+  useEffect(() => {
+    let oldCartData = JSON.parse(localStorage.getItem("CART")) ?? [];
+    console.log("oldCartData", oldCartData);
+    setcart(oldCartData);
+  }, []);
 
-    useEffect(()=>{
-        if (cart) localStorage.setItem("CART", JSON.stringify(cart))
-    },[])
+  useEffect(() => {
+    // console.log("cart", cart);
+    if (cart.length > 0) localStorage.setItem("CART", JSON.stringify(cart));
+  }, [cart]);
 
-
-    return (
-        <cartContext.Provider value={obj}>
-            {children}
-        </cartContext.Provider>
-
-    )
+  return <cartContext.Provider value={obj}>{children}</cartContext.Provider>;
 }
-export { cartContext }
+export { cartContext };
