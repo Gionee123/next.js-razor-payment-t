@@ -11,8 +11,7 @@ export default function Cart() {
     console.log("cart", cart)
     const [Totalprice, setTotalprice] = useState(0)
     const [Totaltax, setTotaltax] = useState(0)
-    const [isLoading, setIsLoading] = useState(false);
-
+    const [loading, setloading] = useState(false) // loading dekh ne ke liye
     // const [Razorpay] = useRazorpay(); // error show razor apy
     const { error, Razorpay } = useRazorpay(); //error soultion
 
@@ -50,11 +49,14 @@ export default function Cart() {
 
 
     const placeOrder = () => {
+        setloading(true); // लोडिंग स्टेट सेट करें
+
         if (!cart || cart.length === 0) {
             alert("Your cart is empty!");
+            setloading(false); // ✅ Fix added
+
             return;
         }
-        setIsLoading(true); // लोडिंग स्टेट सेट करें
 
 
         const userId = 1001; // Ideally, get this from the auth state
@@ -89,16 +91,18 @@ export default function Cart() {
                 console.log(success)
                 if (success.data.data.status) {
                     openPaymentPopUp(success.data.data.id, success.data.data);
+                    setloading(false);
+
                 } else {
                     alert("Failed to create order");
-                    setIsLoading(false);
+                    setloading(false);
 
                 }
             }
         ).catch((error) => {
             console.error("Order Error:", error);
             alert("Payment failed. Please try again.");
-            setIsLoading(false);
+            setloading(false);
 
         });
     }
@@ -132,7 +136,7 @@ export default function Cart() {
                     console.error("Error confirming order", error);
                     alert("Something went wrong. Please try again.");
                 })
-                    .finally(() => setIsLoading(false)); // ✅ लोडिंग false करें
+                    .finally(() => setloading(false)); // ✅ लोडिंग false करें
 
             },
             prefill: {
@@ -150,7 +154,7 @@ export default function Cart() {
         const rzp1 = new Razorpay(options);
 
         rzp1.on("payment.failed", function (response) {
-            setIsLoading(false); // Payment fail होते ही लोडिंग बंद करें
+            setloading(false);
 
             console.error("Payment failed", response);
             alert("Payment failed. Please try again.");
@@ -278,10 +282,10 @@ export default function Cart() {
                         </div>
                         <button
                             className="relative h-[50px] bg-indigo-500 text-white w-full py-3 mt-4 rounded-md cursor-pointer flex justify-center items-center"
-                            disabled={isLoading}
+                            disabled={loading}
                             onClick={placeOrder}
                         >
-                            {isLoading ? (
+                            {loading ? (
                                 <AiOutlineLoading3Quarters className="animate-spin text-green-500 text-2xl" />
                             ) : (
                                 "Checkout"
